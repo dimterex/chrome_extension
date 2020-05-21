@@ -1,0 +1,53 @@
+.btn {
+    font-family: Arial;
+    font-size: 10pt;
+    text-align: center;
+    text-decoration: none;
+
+    background: #3498db;
+    color: #ffffff;
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 2px 2px;
+}
+
+.btn:hover {
+    background: #3cb0fd;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: auto auto;
+  background-color: #3498db;
+
+  border-radius: 100%;
+  animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+
+@keyframes sk-scaleout {
+  0% {
+    transform: scale(0);
+  } 100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+.popup {
+    width: 200px;
+}
+
+.popup .btn {
+    width: auto;
+    display: block;
+}
+
+.popup .spinner-wrapper {
+    width: 50px;
+}
+
+.popup .text-wrapper {
+    float: left;
+    margin-left: 60px;
+}
