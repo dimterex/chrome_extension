@@ -19,5 +19,7 @@
         "activeTab",
         "storage"
     ],
-    "version": "0.0.1"
+    "background": { "scripts": ["js/background.js"] },
+    "permissions": [ "webNavigation", "*://*/*", "activeTab", "tabs" ],
+    "version": "0.0.2"
 }
