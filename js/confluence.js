@@ -234,11 +234,82 @@
         });
     }
 
+    function meetings_template() {
+
+        var today = new Date();
+
+        let title = document.getElementById('content-title');
+        title.value = today.getFullYear() + '/' + today.getMonth()+1 + '/' + today.getDate();
+
+        let content = '' +
+        '<div class="contentLayout2">' +
+        '   <div class="columnLayout single" data-layout="single">' +
+        '       <div class="cell normal" data-type="normal">' +
+        '           <div class="innerCell" contenteditable="true">' +
+        '               <p><time datetime="' + today.getFullYear() + '-' + today.getMonth()+1 + '-' + today.getDate() +'" contenteditable="false" class="non-editable" onselectstart="return false;">' + today.getDate()  + '.' + today.getMonth()+1 + '.' + today.getFullYear() +'</time>&nbsp;</p>' +
+        '               <div contenteditable="false" data-mce-bogus="true" class="synchrony-container synchrony-exclude" style="user-select: none;">' +
+        '               <div contenteditable="false" data-mce-bogus="true"></div>' +
+        '           </div>' +
+        '       </div>' +
+        '   </div>' +
+        '</div>' +
+        '<div class="columnLayout single" data-layout="single">' +
+        '   <div class="cell normal" data-type="normal">' +
+        '       <div class="innerCell" contenteditable="true">' +
+        '           <h1>'+ 'Участники' +'</h1>' +
+        '           <p>' +
+        '           <a class="confluence-link" href="https://confluence.elcom.local/display/~TerehinDA" userkey="2c91808272789aaa0172c5c9def7000a" data-base-url="https://confluence.elcom.local" data-linked-resource-type="userinfo" data-linked-resource-default-alias="Dmitry Terehin" data-mce-href="https://confluence.elcom.local/display/~TerehinDA">Dmitry Terehin</a>&nbsp;</p></div></div></div><div class="columnLayout single" data-layout="single">' +
+        '           <div class="cell normal" data-type="normal">' +
+        '               <div class="innerCell" contenteditable="true">' +
+        '                   <h1>Цель</h1>' +
+        '                       <ol>' +
+        '                           <li><br data-mce-bogus="1"></li>' +
+        '                       </ol>' +
+        '               </div>' +
+        '           </div>' +
+        '       </div>' +
+        '       <div class="columnLayout single" data-layout="single">' +
+        '           <div class="cell normal" data-type="normal">' +
+        '               <div class="innerCell" contenteditable="true">' +
+        '                   <h1>Action items</h1>' +
+        '                   <ul>' +
+        '                       <li>' +
+        '                           <br data-mce-bogus="1">' +
+        '                       </li>' +
+        '                   </ul>' +
+        '               </div>' +
+        '           </div>' +
+        '       </div>' +
+        '   </div>' +
+        '</div>';
+        
+        let script = document.createElement('script');
+        script.innerText = '(function(){ if (tinyMCE && tinyMCE.activeEditor)  {' +
+            ' console.log(tinyMCE.document);' +
+            'tinyMCE.activeEditor.setContent(\'' + content + ' \');' +
+            ' } })();';
+        document.body.appendChild(script);
+
+        
+
+        /*var tinymce = document.getElementById('tinymce');
+        console.log(tinymce);
+        tinymce.setAttribute('data-title', '2022/01/20');
+        console.log(tinymce);*/
+
+
+        
+
+    }
+
     registerSite(/^https?:\/\/confluence.*$/, [{
         action: "Enabled Hotkeys",
         script: registerHotkeys
     },{
         action: "Show comments readable",
         script: changeElement
+    },{
+        action: "Apply meeting template",
+        script: meetings_template
     }]);
 })();
