@@ -93,35 +93,50 @@
             "let druggable = document.getElementById('" + DRUGGABLE_ID +"');" +
             "var x = 0; var y = 0;" +
             "var w = 0; var h = 0;" +
+            "var isLeftSide = false;" +
             " const mouseDownHandler = function (e) {" +
             "    x = e.clientX;" +
             "    y = e.clientY;" +
+            "    isLeftSide = e.target.classList.contains('resizer-l');" +
             "    document.addEventListener('mousemove', mouseMoveHandler);" +
             "    document.addEventListener('mouseup', mouseUpHandler);" +
             "};" +
             
             "iteration = 0;" +
-            "const mouseMoveHandler = function (e) {" +
-            "    const styles = window.getComputedStyle(movable);" +
-            /*"   How far the mouse has been moved" +*/
-            "    const dx = e.clientX - x;" +
-            "    const dy = e.clientY - y;" +
-            "    x = e.clientX;" +
-            "    y = e.clientY;" +
 
-            "    w = parseInt(styles.width, 10);" +
-            "    h = parseInt(styles.height, 10);"  +
-            "console.log(event);" +
-            /*"    // Adjust the dimension of element" +*/
-            /*"    console.log('mouseMoveHandler: iteration=' + iteration+'    width=' + druggable.style.width + '    height=' + druggable.style.height);" +
-            "    console.log('mouseMoveHandler: iteration=' + iteration+'    dx=' + dx + '    dy=' + dy);" +
-            "    console.log('mouseMoveHandler: iteration=' + iteration+'    x=' + x + '    y=' + y + '    w=' + w + '    h=' + h);" +
-            */
-            "    druggable.style.width = (w + dx) +'px';" +
-            "    druggable.style.height = (h + dy) +'px';" +
-            /*"   console.log('mouseMoveHandler: iteration=' + iteration+'    width=' + druggable.style.width + '    height=' + druggable.style.height);" +
-            "   iteration++;" +*/
+            "const mouseMoveHandler = function (e) {" +
+                "const styles = window.getComputedStyle(movable);" +
+                "const dx = e.clientX - x;" +
+                "const dy = e.clientY - y;" +
+                "x = e.clientX;" +
+                "y = e.clientY;" +
+        
+                "w = parseInt(styles.width, 10);" +
+                "h = parseInt(styles.height, 10);" +
+                "/* console.log('start iteration: '' + iteration); */" +
+                "var old_left = parseInt(druggable.style.left, 10);" +
+        
+                "/* console.log('mouseMoveHandler: dx=' + dx + '    dy=' + dy); */" +
+                "/* console.log('mouseMoveHandler: x=' + x + '    y=' + y + '    w=' + w + '    h=' + h); */" +
+        
+                "if (isLeftSide) {" +
+                "   if (old_left) {" +
+                "       druggable.style.left  = (old_left + dx) +'px';" +
+                "       druggable.style.width = (w - dx) +'px';" +
+                "       druggable.style.height = (h - dy) +'px';" +
+                "   } else {" +
+                "       druggable.style.left  = -1 +'px';" +
+                "   }" +
+                "} else {" +
+                    "druggable.style.width = (w + dx) +'px';" +
+                    "druggable.style.height = (h + dy) +'px';" +
+                "}" +
+        
+                "/* console.log('mouseMoveHandler: width=' + druggable.style.width + '    height=' + druggable.style.height); */" +
+                "/* console.log('end iteration: ' + iteration); */" +
+               "iteration++;" +
             "};" +
+
 
             "const mouseUpHandler = function () {" +
             /*"    // Remove the handlers of `mousemove` and `mouseup`" +*/
@@ -135,7 +150,6 @@
             "});" +
             "}";
             document.body.appendChild(resize_script);
-
 
             let script = document.createElement('script');
             script.innerText = "" + 
@@ -199,6 +213,7 @@
             "    }" +
             "}, true); " +
             "}";
+
             document.body.appendChild(script);
         }
 
@@ -234,19 +249,30 @@
         });
     }
 
-    function meetings_template() {
-
+    function meeting_template() {
         var today = new Date();
 
+        var month = today.getMonth() + 1;
+        var rawMonth = month.toString();
+
+        if (month < 10)
+            rawMonth = "0" + rawMonth;
+
         let title = document.getElementById('content-title');
-        title.value = today.getFullYear() + '/' + today.getMonth()+1 + '/' + today.getDate();
+        title.value = today.getFullYear() + '/' + rawMonth + '/' + today.getDate();
+
+        let userKey = document.querySelector('meta[name="ajs-remote-user-key"]').content;
+        let user = document.querySelector('meta[name="ajs-remote-user"]').content;
+        let displayUser = document.querySelector('meta[name="ajs-user-display-name"]').content;
+
+        let author = `<a class="confluence-link" href="./display/~${user}" userkey="${userKey}" data-base-url="." data-linked-resource-type="userinfo" data-linked-resource-default-alias="${displayUser}" data-mce-href="./display/~${user}">${displayUser}</a>`;
 
         let content = '' +
         '<div class="contentLayout2">' +
         '   <div class="columnLayout single" data-layout="single">' +
         '       <div class="cell normal" data-type="normal">' +
         '           <div class="innerCell" contenteditable="true">' +
-        '               <p><time datetime="' + today.getFullYear() + '-' + today.getMonth()+1 + '-' + today.getDate() +'" contenteditable="false" class="non-editable" onselectstart="return false;">' + today.getDate()  + '.' + today.getMonth()+1 + '.' + today.getFullYear() +'</time>&nbsp;</p>' +
+        '               <p><time datetime="' + today.getFullYear() + '-' + rawMonth + '-' + today.getDate() +'" contenteditable="false" class="non-editable" onselectstart="return false;">' + today.getDate()  + '.' + rawMonth + '.' + today.getFullYear() +'</time>&nbsp;</p>' +
         '               <div contenteditable="false" data-mce-bogus="true" class="synchrony-container synchrony-exclude" style="user-select: none;">' +
         '               <div contenteditable="false" data-mce-bogus="true"></div>' +
         '           </div>' +
@@ -258,7 +284,7 @@
         '       <div class="innerCell" contenteditable="true">' +
         '           <h1>'+ 'Участники' +'</h1>' +
         '           <p>' +
-        '           <a class="confluence-link" href="https://confluence.elcom.local/display/~TerehinDA" userkey="2c91808272789aaa0172c5c9def7000a" data-base-url="https://confluence.elcom.local" data-linked-resource-type="userinfo" data-linked-resource-default-alias="Dmitry Terehin" data-mce-href="https://confluence.elcom.local/display/~TerehinDA">Dmitry Terehin</a>&nbsp;</p></div></div></div><div class="columnLayout single" data-layout="single">' +
+        `         ${author}&nbsp;</p></div></div></div><div class="columnLayout single" data-layout="single">` +
         '           <div class="cell normal" data-type="normal">' +
         '               <div class="innerCell" contenteditable="true">' +
         '                   <h1>Цель</h1>' +
@@ -289,27 +315,151 @@
             'tinyMCE.activeEditor.setContent(\'' + content + ' \');' +
             ' } })();';
         document.body.appendChild(script);
+    }
 
+    function meetings_template() {
+        var today = new Date();
+
+        let title = document.getElementById('content-title');
+        let nodeNames = document.getElementById("breadcrumbs");
+        let lastNode = nodeNames.children.item(nodeNames.children.length - 1);
+        let parrentNodeName = lastNode.children[0].children[0].innerText;
+
+        title.value = "Meetings - " + parrentNodeName;
+
+        let content = '' +
+        '<div class="contentLayout2">' +
+        '    <div class="columnLayout single" data-layout="single">' +
+        '        <div class="cell normal" data-type="normal">' +
+        '            <div class="innerCell" contenteditable="true">' +
+        '                <p>' +
+        '                    <img class="editor-inline-macro" src="/plugins/servlet/confluence/placeholder/macro?definition=e2NoaWxkcmVufQ&amp;locale=ru_RU&amp;version=2" data-macro-name="children" data-macro-schema-version="2" data-macro-id="ad2cdcff-3a2e-41cb-bc33-4154840e2fb5">' +
+        '                    <br data-mce-bogus="1">' +
+        '                </p>' +
+        '                <div div contenteditable="false" data-mce-bogus="true" class="synchrony-container synchrony-exclude" style="user-select: none;">' +
+        '                    <div contenteditable="false" data-mce-bogus="true">' +
+        '                    </div>' +
+        '                </div>' +
+        '            </div>' +
+        '        </div>' +
+        '    </div>' +
+        '</div>';
+
+        let script = document.createElement('script');
+        script.innerText = '(function(){ if (tinyMCE && tinyMCE.activeEditor)  {' +
+            ' console.log(tinyMCE.document);' +
+            'tinyMCE.activeEditor.setContent(\'' + content + ' \');' +
+            ' } })();';
+        document.body.appendChild(script);
+    }
+
+    function fill_header() {
+        var innder_thml = document.getElementById('wysiwygTextarea_ifr').contentWindow.document;
+        let details_table = innder_thml.querySelectorAll('table[data-macro-name="details"]')[0];
+        if (!details_table)
+            return;
+
+        let table = details_table.querySelectorAll('table')[0];
+        if (!table)
+            return;
+
+        const ROW_COUNT = 8;
+        if (table.rows.length != ROW_COUNT) {
+            alert("Incorrect header of document");
+            return;
+        }
+
+        let code_row = table.rows[0];
+        let eng_name_row = table.rows[1];
+        let ru_name_row = table.rows[2];
+        let status_row = table.rows[3];
+        let author_row = table.rows[4];
+        let created_date_row = table.rows[5];
+        let finished_date_row = table.rows[6];
+        let links_row = table.rows[7];
+
+        function change_value(row, value) {
+            console.log("row: " + row);
+            console.log("value: " + value);
+            let comment = row.querySelectorAll("span")[0];
+            if (!comment) 
+                return;
+            comment.parentElement.innerHTML = `${value}  ${comment.outerHTML}`;
+        }
+
+        let title = document.getElementById('content-title');
+        let nodeNames = document.getElementById("breadcrumbs");
+        let lastNode = nodeNames.children.item(nodeNames.children.length - 1);
+        let parrentNodeName = lastNode.children[0].children[0].innerText;
+        let full_name = parrentNodeName.split(' ');
         
+        let id_parser = full_name[0].split('-');
+        let project_id = id_parser[0];
+        let parent_id = id_parser[1];
 
-        /*var tinymce = document.getElementById('tinymce');
-        console.log(tinymce);
-        tinymce.setAttribute('data-title', '2022/01/20');
-        console.log(tinymce);*/
+        let document_name = parrentNodeName.replace(full_name[0] + " ", "");
+        let document_id = `${project_id}-TS.${parent_id}`;
+        title.value = `${document_id} ${document_name}`;
 
+        change_value(code_row, document_id);
+        change_value(eng_name_row, document_name);
 
-        
+        let userKey = document.querySelector('meta[name="ajs-remote-user-key"]').content;
+        let user = document.querySelector('meta[name="ajs-remote-user"]').content;
+        let displayUser = document.querySelector('meta[name="ajs-user-display-name"]').content;
 
+        let author = `<a class="confluence-link" href="./display/~${user}" userkey="${userKey}" data-base-url="." data-linked-resource-type="userinfo" data-linked-resource-default-alias="${displayUser}" data-mce-href="./display/~${user}">${displayUser}</a>`;
+        change_value(author_row, author);
+
+        var today = new Date();
+
+        var month = today.getMonth() + 1;
+        var rawMonth = month.toString();
+        var rawDay = today.getDate().toString();
+
+        if (month < 10)
+            rawMonth = "0" + rawMonth;
+        if (today.getDate() < 10)
+            rawDay = "0" + rawDay;
+
+        let datetime = '<time datetime="' + today.getFullYear() + '-' + rawMonth + '-' + rawDay +'" contenteditable="false" class="non-editable" onselectstart="return false;">' + rawDay  + '.' + rawMonth + '.' + today.getFullYear() +'</time>'
+        change_value(created_date_row, datetime);
+    }
+
+    function notify_about_changes() {
+        var target = "mail@example.org";
+        var carbon_copy = "second@example.org";
+        var subject = "subject text";
+        var body = "body text";
+
+        var linkBuilder = [];
+        linkBuilder.push("mailto:" + target);
+        linkBuilder.push("cc=" + carbon_copy);
+        linkBuilder.push("subject=" + subject);
+        linkBuilder.push("body=" + body);
+
+        var link = linkBuilder.join("&");
+
+        window.location.href = link;
     }
 
     registerSite(/^https?:\/\/confluence.*$/, [{
-        action: "Enabled Hotkeys",
+        action: "Enabled Hotkeys [Deprecated]",
         script: registerHotkeys
     },{
         action: "Show comments readable",
         script: changeElement
     },{
-        action: "Apply meeting template",
+        action: "Apply meetings template",
         script: meetings_template
+    },{
+        action: "Apply meeting template",
+        script: meeting_template
+     },{
+        action: "Apply header of document",
+        script: fill_header,
+    },{
+        action: "Notify about changes",
+        script: notify_about_changes
     }]);
 })();

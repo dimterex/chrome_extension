@@ -4,7 +4,7 @@
     function fill_flat_query() {
 
         var dict = {};
-        dict["price[max]"] = 8500;
+        dict["price[max]"] = 10000;
         dict["otype"] = 1;
         dict["knum[3]"] = "on";
         dict["knum[4]"] = "on";
@@ -31,7 +31,7 @@
       function fill_house_query() {
 
         var dict = {};
-        dict["price[max]"] = 500;
+        dict["price[max]"] = 1700;
         dict["otype"] = 2;
         // dict["knum[3]"] = "on";
         // dict["knum[4]"] = "on";
@@ -40,10 +40,13 @@
         // dict["kv_su[value]"] = 1;
         // dict["kv_loggia[1]"] = "on";
         // dict["kv_loggia[2]"] = "on";
-        // dict["mat[1]"] = "on";
-        // dict["mat[2]"] = "on";
-        // dict["mat[3]"] = "on";
-        // dict["mat[6]"] = "on";
+        dict["mat[1]"] = "on";
+        dict["mat[2]"] = "on";
+        dict["mat[3]"] = "on";
+        dict["mat[4]"] = "on";
+        dict["mat[6]"] = "on";
+        dict["mat[7]"] = "on";
+        dict["mat[8]"] = "on";
         dict["electricity[value]"] = "on";
         // dict["water[value]"] = "on";
         // dict["heating[value]"] = "on";
