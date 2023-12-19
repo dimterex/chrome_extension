@@ -1,12 +1,12 @@
 let document_statuses = {
-      "draft": { color: "yellow", subtle: false },
-      "progress": { color: "green", subtle: false },
-      "review": { color: "red", subtle: false },
-      "rework": { color: "green", subtle: false },
-      "hold": { color: "yellow", subtle: false },
+      "draft": { color: "yellow", subtle: true },
+      "progress": { color: "blue", subtle: false },
+      "review": { color: "blue", subtle: true },
+      "rework": { color: "yellow", subtle: false },
+      "hold": { color: "red", subtle: false },
       "estimate": { color: "gray", subtle: true },
-      "done": { color: "blue", subtle: false },
-      "postponed": { color: "blue", subtle: true },
+      "done": { color: "green", subtle: false },
+      "postponed": { color: "red", subtle: true },
       "obsolete": { color: "gray", subtle: false }
 }
 

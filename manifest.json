@@ -21,11 +21,12 @@
         "contextMenus",
         "webNavigation",
         "tabs",
-        "scripting"
+        "scripting",
+        "http://*/",
+        "https://*/"
     ],
     "background": {
         "service_worker": "content-scripts/context_menu.js"
-
     },
     "host_permissions": [
         "*://*/*",
@@ -36,5 +37,5 @@
         "js": ["content-scripts/confluence.js"],
         "run_at": "document_end"
     }],
-    "version": "0.0.3"
+    "version": "0.0.4"
 }

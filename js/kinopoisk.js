@@ -9,7 +9,7 @@
 
      function kk_query() {
         var address = location.href;
-        var new_address = address.replace("www.kinopoisk.ru", "www.kinopoiskk.ru");
+        var new_address = address.replace("www.kinopoisk.ru", "www.kinopoisk.cx");
         window.open(new_address);
     }
 

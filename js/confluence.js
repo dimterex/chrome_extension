@@ -263,7 +263,7 @@
 
         let userKey = document.querySelector('meta[name="ajs-remote-user-key"]').content;
         let user = document.querySelector('meta[name="ajs-remote-user"]').content;
-        let displayUser = document.querySelector('meta[name="ajs-user-display-name"]').content;
+        let displayUser = document.querySelector('meta[name="ajs-current-user-fullname"]').content;
 
         let author = `<a class="confluence-link" href="./display/~${user}" userkey="${userKey}" data-base-url="." data-linked-resource-type="userinfo" data-linked-resource-default-alias="${displayUser}" data-mce-href="./display/~${user}">${displayUser}</a>`;
 
@@ -406,7 +406,7 @@
 
         let userKey = document.querySelector('meta[name="ajs-remote-user-key"]').content;
         let user = document.querySelector('meta[name="ajs-remote-user"]').content;
-        let displayUser = document.querySelector('meta[name="ajs-user-display-name"]').content;
+        let displayUser = document.querySelector('meta[name="ajs-current-user-fullname"]').content;
 
         let author = `<a class="confluence-link" href="./display/~${user}" userkey="${userKey}" data-base-url="." data-linked-resource-type="userinfo" data-linked-resource-default-alias="${displayUser}" data-mce-href="./display/~${user}">${displayUser}</a>`;
         change_value(author_row, author);
@@ -426,25 +426,121 @@
         change_value(created_date_row, datetime);
     }
 
-    function notify_about_changes() {
-        var target = "mail@example.org";
-        var carbon_copy = "second@example.org";
-        var subject = "subject text";
-        var body = "body text";
+    function show_all_anchors() {
+        let anchors = document.querySelectorAll('span[data-macro-name="anchor"]');
+        let title = document.getElementById('content-title');
 
-        var linkBuilder = [];
-        linkBuilder.push("mailto:" + target);
-        linkBuilder.push("cc=" + carbon_copy);
-        linkBuilder.push("subject=" + subject);
-        linkBuilder.push("body=" + body);
+        const css_style = "<style>" +
+        "div:hover {" +
+        "   color: blue;" +
+        "}" +
 
-        var link = linkBuilder.join("&");
+        "</style>";
+        const copy_script = "<script>"+ 
+        "function copy(value) {" +
+        "   navigator.clipboard.writeText(value);" +
+        "   redirect(value);"+
+        "}" +
+        "function redirect(value) {" +
+        "   var temp_messages = document.getElementById('messages');" +
+        "   temp_messages.innerText ='Copied: ' + value;" +
+        "   setTimeout(() => {" +
+        "    temp_messages.innerText = '';" +
+        "  }, 3000);" +
+        "}" +
+        "</script>";
 
-        window.location.href = link;
+        const header = `<!DOCTYPE html> <html> <title>${title.value} anchors </title> ${copy_script} ${css_style} <body>`;
+        const footer = "</body> </html>";
+        let content = [];
+        content.push(`<p id="messages"></p>`);
+
+        anchors.forEach(element => {
+            let href =`${title.value}#${element.id.split("-")[1]}`;
+            content.push(`<div onclick='copy(String.raw\`${href}\`)'>${href}</div>`);
+        });
+
+        const winUrl = URL.createObjectURL(
+            new Blob([`${header} ${content.join("")} ${footer}`], { type: "text/html" })
+        );
+
+        const win = window.open(
+            winUrl,
+            "win",
+            `width=600,height=300,screenX=200,screenY=200`
+        );
+    }
+
+    function update_diagram_numbers() {
+        var innder_thml = document.getElementById('wysiwygTextarea_ifr').contentWindow.document;
+        let diagrams = innder_thml.querySelectorAll('table[data-macro-name="plantuml"]');
+
+        for (var i = 0; i < diagrams.length; i++) {
+            let diagram = diagrams[i];
+            let diagram_order = i + 1;
+            update_diagram_number(diagram, diagram_order);
+            update_comment_line(diagram, diagram_order);
+            update_theme(diagram);
+        }
+
+        function update_diagram_number(diagram, number) {
+            var diagram_id_element = diagram.nextElementSibling.querySelector('p strong');
+            var diagram_name = `Diagram ${number}: `;
+            if (diagram_id_element) {
+                diagram_id_element.innerText = diagram_name;
+                console.log('Update diagram number on diagram: ', number);
+            } else {
+                let row = innder_thml.createElement('p');
+                
+                var number_row = innder_thml.createElement('strong');
+                number_row.innerText = diagram_name;
+                row.appendChild(number_row);
+
+                var name_row = innder_thml.createElement('strong');
+                name_row.classList.add('text-placeholder');
+                name_row.innerText = "Название диаграммы, кратко описывающее суть на ней. Номер диаграммы инкрементируется";
+                row.appendChild(name_row);
+
+                diagram.parentNode.insertBefore(row, diagram.nextElementSibling);
+                console.log('Add diagram number on diagram: ', number);
+            }
+        }
+
+        function update_comment_line(diagram, number) {
+            var diagram_comment_element = diagram.previousElementSibling;
+            
+            var diagram_comment = diagram_comment_element.querySelector('p span');
+
+            if (diagram_comment && diagram_comment.innerText.startsWith('comment')) {
+                 console.log('Exist comment line on diagram: ', number);
+            } else {
+                diagram_comment = innder_thml.createElement('p');
+                var comment_row = innder_thml.createElement('span');
+
+                comment_row.setAttribute("style", "color: #a5adba; letter-spacing: 0px");
+                comment_row.innerHTML = 'comment #01 &nbsp; comment #02 &nbsp; comment #03 &nbsp; comment #04 &nbsp; comment #05 &nbsp; comment #06 &nbsp; comment #07 &nbsp; comment #08 &nbsp; comment #09 &nbsp; comment #10'
+
+                diagram_comment.appendChild(comment_row);
+                diagram_comment_element.appendChild(diagram_comment);
+                console.log('Add comment line on diagram: ', number);
+            }
+
+        }
+
+        function update_theme(diagram) {
+            diagram.setAttribute("data-macro-parameters", "align=left|atlassian-macro-output-type=BLOCK|border=1|format=SVG|hspace=5|vspace=5|preserveWhiteSpaces=true");
+
+            let content = diagram.querySelector('pre');
+            if (content) {
+                if (!content.innerText.startsWith("!theme vibrant")) {
+                    content.innerText = "!theme vibrant \n" + content.innerText;
+                }
+            }
+        }
     }
 
     registerSite(/^https?:\/\/confluence.*$/, [{
-        action: "Enabled Hotkeys [Deprecated]",
+        action: "Enabled Hotkeys",
         script: registerHotkeys
     },{
         action: "Show comments readable",
@@ -459,7 +555,10 @@
         action: "Apply header of document",
         script: fill_header,
     },{
-        action: "Notify about changes",
-        script: notify_about_changes
+        action: "Show all anchors",
+        script: show_all_anchors
+    },{
+        action: "Update diagrams",
+        script: update_diagram_numbers
     }]);
 })();
