@@ -41,10 +41,11 @@
             var liElement = liElements[i];
             var path = url + liElement.getAttribute('data-key');
             var name = liElement.getAttribute('title');
-            content.push(path + ": " + name);
+           
+            content.push(`<div>${path + ": " + name}</div>`);
         }
 
-        const header = `<!DOCTYPE html> <html> <body>`;
+        const header = `<!DOCTYPE html> <html lang="ru"> <head> <meta charset="utf-8"> </head> <body>`;
         const footer = "</body> </html>";
 
         const winUrl = URL.createObjectURL(
@@ -58,7 +59,7 @@
         );
     }
 
-    registerSite(/^https?:\/\/orpo-jira.*$/, [{
+    registerSite(/^https?:\/\/jira.*$/, [{
         action: "Open MR",
         script: openLinkedMerges
     },{
