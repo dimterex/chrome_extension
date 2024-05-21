@@ -25,16 +25,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                   if (status) {
                         change_document_status(request.action, status.color, status.subtle);
                   }
-                  break;
+                  return;
             case "change_qna_status":
                   let qna_status = qna_statuses[request.action];
                   if (qna_status) {
                         change_document_status(request.action, qna_status.color, qna_status.subtle);
                   }
-                  break;
-
-            default:
-                  sendResponse({ fromcontent: `Can't find handler for ${request.id}`});
+                  return;
       }
 });
 

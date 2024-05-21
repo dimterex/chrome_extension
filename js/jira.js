@@ -41,7 +41,6 @@
             var liElement = liElements[i];
             var path = url + liElement.getAttribute('data-key');
             var name = liElement.getAttribute('title');
-           
             content.push(`<div>${path + ": " + name}</div>`);
         }
 

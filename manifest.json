@@ -1,4 +1,6 @@
 {
+    "manifest_version": 3,
+    "name": "dimterex extension",
     "action": {
         "default_icon": "icons/32.png",
         "default_popup": "html/popup.html"
@@ -13,17 +15,13 @@
         "64": "icons/64.png",
         "128": "icons/128.png"
     },
-    "manifest_version": 3,
-    "name": "dimterex extension",
     "permissions": [
         "activeTab",
         "storage",
         "contextMenus",
         "webNavigation",
         "tabs",
-        "scripting",
-        "http://*/",
-        "https://*/"
+        "scripting"
     ],
     "background": {
         "service_worker": "content-scripts/context_menu.js"
@@ -36,6 +34,10 @@
         "matches": ["<all_urls>"],
         "js": ["content-scripts/confluence.js"],
         "run_at": "document_end"
+    }, {
+        "matches": ["<all_urls>"],
+        "js": ["content-scripts/ant_designer.js"],
+        "run_at": "document_end"
     }],
-    "version": "0.0.4"
+    "version": "0.0.5"
 }
