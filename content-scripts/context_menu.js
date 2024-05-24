@@ -1,7 +1,7 @@
-var actions = {
+let actions = {
     "change_document_status": {
         title: "Set document status",
-        scritps: {
+        scripts: {
             "progress": "progress",
             "review": "review",
             "rework": "rework",
@@ -15,7 +15,7 @@ var actions = {
     },
     "change_qna_status": {
         title: "Set QNA status",
-        scritps: {
+        scripts: {
             "new": "new",
             "progress": "progress",
             "answered": "answered",
@@ -24,18 +24,55 @@ var actions = {
         },
         contexts: ["selection", "editable"],
     },
-    "ant_designer_table": {
-        title: "Change table",
-        scritps: {
-            "remove_cell": "Удалить колонку",
-            "insert_cell": "Вставть колонку в конец",
-            "copy_cell": "Дублировать колонку",
-            "remove_row": "Удалить строку",
-            "add_row": "Дублировать строку",
+    "tables": {
+        title: "Редактирование таблиц",
+        submenu_items: {
+            "rows": {
+                title: "Строки",
+                scripts: {
+                    "remove": "Удалить",
+                    "clone": "Дублировать"
+                }
+            },
+            "columns": {
+                title: "Колонки",
+                scripts: {
+                    "remove": "Удалить ",
+                    "insert": "Вставть в конец",
+                    "clone": "Дублировать",
+                    "clear": "Очистить"
+                },
+            },
+            "cells": {
+                title: "Ячейки",
+                scripts: {
+                    "copy": "Скопирвоать",
+                    "paste": "Вставить",
+                    "clear": "Очистить"
+                }
+            }
+        },
+        contexts: ["selection", "editable", "page"],
+    },
+    "elements": {
+        title: "Редактирование элементов",
+        scripts: {
+            "copy": "Скопирвоать",
+            "paste": "Вставить",
+            "clear": "Очистить"
+        },
+        contexts: ["selection", "editable", "page"],
+    },
+    "common": {
+        title: "Общее",
+        scripts: {
+            "save_changes": "Сохранить изменения"
         },
         contexts: ["selection", "editable", "page"],
     }
 }
+
+let action_keys = {}
 
 for(var key in actions) {
     let value = actions[key];
@@ -47,31 +84,61 @@ for(var key in actions) {
         contexts: value.contexts
     });
 
-    for (var subitems in value.scritps) {
-        let item = value.scritps[subitems];
+    if (value.scripts)
+        create_menu_item(value.scripts, key, null, value.contexts);
+
+    if (value.submenu_items)
+        create_submenu(value.submenu_items, key, value.contexts);
+}
+
+function create_menu_item(scripts, root_key, action_key, contexts) {
+    for (var subitems in scripts) {
+        let item = scripts[subitems];
+
+        let subkey = root_key + "_" + subitems;
          chrome.contextMenus.create({
-            id: key + subitems,
+            id: subkey,
             title: item,
-            parentId: key,
+            parentId: root_key,
             type: "normal",
-            contexts: value.contexts
+            contexts: contexts
         });
+
+        if (action_key) {
+            action_keys[subkey] = action_key + "_" + subitems;
+        } else {
+            action_keys[subkey] = subitems;
+        }
+    }
+}
+
+function create_submenu(submenu_items, parent_key, contexts) {
+    for (var submenu in submenu_items) {
+        let item = submenu_items[submenu];
+        let subkey = parent_key + "_" + submenu;
+
+        chrome.contextMenus.create({
+            id: subkey,
+            title: item.title,
+            parentId: parent_key,
+            type: "normal",
+            contexts: contexts
+        });
+
+        if (item.scripts)
+            create_menu_item(item.scripts, subkey, submenu, contexts);
     }
 }
 
 chrome.contextMenus.onClicked.addListener((info) => {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        for(var key in actions) {
-            let value = actions[key];
-
-            for(var subitems in value.scritps) {
-                let item_key = key + subitems;
-                if (item_key === info.menuItemId)
-                {
-                    let currentTabId = tabs[0].id;
-                    chrome.tabs.sendMessage(currentTabId, { id: key, action: subitems });
-                    return;
-                }
+        for(var key in action_keys) {
+            if (key == info.menuItemId){
+                chrome.tabs.sendMessage(tabs[0].id, { 
+                    id: key,
+                    action: action_keys[key],
+                });
+                return;
             }
         }
     });
