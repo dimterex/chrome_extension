@@ -74,6 +74,8 @@ let actions = {
 
 let action_keys = {}
 
+chrome.contextMenus.removeAll();
+
 for(var key in actions) {
     let value = actions[key];
 

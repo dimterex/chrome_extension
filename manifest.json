@@ -22,7 +22,8 @@
         "webNavigation",
         "tabs",
         "scripting",
-        "clipboardRead"
+        "clipboardRead",
+        "nativeMessaging"
     ],
     "background": {
         "service_worker": "content-scripts/context_menu.js"
@@ -33,8 +34,13 @@
     ],
     "content_scripts": [{
         "matches": ["<all_urls>"],
-        "js": ["content-scripts/elements.js", "content-scripts/confluence.js", "content-scripts/tables.js", "content-scripts/save_changes.js"],
+        "js": [
+            "content-scripts/elements.js", 
+            "content-scripts/confluence.js", 
+            "content-scripts/tables.js", 
+            "content-scripts/save_changes.js"
+        ],
         "run_at": "document_end"
     }],
-    "version": "0.0.6"
+    "version": "0.0.7"
 }

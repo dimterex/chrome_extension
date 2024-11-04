@@ -1,12 +1,13 @@
 var registerSite;
 
-(function(){
+(function() {
     "use strict";
 
     let ctrButtonsBlock,
         ctrProgressBlock,
         ctrProgressText,
         __sites = [];
+
 
     registerSite = function(siteRegex, functions) {
         __sites.push({
@@ -33,8 +34,7 @@ var registerSite;
         document.querySelector('html').style.height = height;
     }
 
-    function registerFunction(activeTab, item, callback) {
-
+    function registerFunction(activeTab, item) {
         let div = document.createElement("div");
         let button = document.createElement("a");
         button.href = "#";
@@ -43,48 +43,60 @@ var registerSite;
 
         div.appendChild(button);
         
-        if (item.submenu)
-        {
-            var dropdown_content = document.createElement("div");
-            div.appendChild(dropdown_content);
-
-            div.classList = ["dropdown"];
-            dropdown_content.classList = ["dropdown-content"];
-
-             for (let i = 0; i < item.submenu.length; ++i) {
-                var submenu = item.submenu[i];
-                let submenu_button = document.createElement("a");
-                submenu_button.classList = ["btn"];
-                submenu_button.innerText = submenu.action;
-
-                submenu_button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    injectScript(activeTab, submenu.script);
-                });
-
-                dropdown_content.appendChild(submenu_button);
-            }
-        }
-        else
-        {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                injectScript(activeTab, item.script);
-            });
-        }
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            injectScript(activeTab, item.script);
+        });
 
         ctrButtonsBlock.appendChild(div);
     }
 
     function injectScript(tab, script) {
+        console.log(script);
+
         chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: script,
-          world: "MAIN"
-        });
+            target: { tabId: tab.id },
+            func: script,
+            world: "MAIN"
+          });          
+    }
+
+    function injectEventListeners(tab) {
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+                document.addEventListener("open_window", function(event) {
+                    console.log(event);
+                    if (event.type) {
+                        switch (event.type) {
+                            case "open_window":
+                                const header = `<!DOCTYPE html> <html lang="ru"> <head> <meta charset="utf-8"> </head> <body>`;
+                                const footer = "</body> </html>";
+                                const e = event.detail;
+                        
+                                const winUrl = URL.createObjectURL(
+                                    new Blob([`${header} ${e.text} ${footer}`], { type: "text/html" })
+                                );
+                        
+                                window.open(
+                                    winUrl,
+                                    e.win_name,
+                                    `width=600,height=300,screenX=200,screenY=200`
+                                );
+                                return;
+                            default:
+                                return;
+                        }
+                    }
+                });
+            },
+            world: "MAIN"
+          }); 
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        console.log(document);
+
         ctrButtonsBlock = document.getElementById('buttons-block');
         ctrProgressBlock = document.getElementById('progress-block');
         ctrProgressText = document.getElementById('progress-text');
@@ -99,6 +111,8 @@ var registerSite;
                         registerFunction(activeTab, functions[j]);
                     }
 
+                    injectEventListeners(activeTab);
+                   
                     return;
                 }
             }

@@ -31,32 +31,63 @@
     }
 
     function copyForComments() {
-
         var olElement = document.querySelector('ol.issue-list');
         var liElements = olElement.querySelectorAll('li');
-        var url = location.origin + '/browse/'
+        var url = location.origin + '/browse/';
 
         let content = [];
         for (var i = 0; i < liElements.length; i++) {
             var liElement = liElements[i];
             var path = url + liElement.getAttribute('data-key');
             var name = liElement.getAttribute('title');
+            console.log(name)
             content.push(`<div>${path + ": " + name}</div>`);
         }
 
-        const header = `<!DOCTYPE html> <html lang="ru"> <head> <meta charset="utf-8"> </head> <body>`;
-        const footer = "</body> </html>";
-
-        const winUrl = URL.createObjectURL(
-            new Blob([`${header} ${content.join("")} ${footer}`], { type: "text/html" })
-        );
-
-        const win = window.open(
-            winUrl,
-            "win",
-            `width=600,height=300,screenX=200,screenY=200`
-        );
+        var event = new CustomEvent("open_window", { detail: {
+            text: content.join(""),
+            win_name: "comments",
+        } });
+        document.dispatchEvent(event);
     }
+
+    function copyForBacklog() {
+        var issue_id = document.querySelector('a.issue-link').getAttribute('data-issue-key');
+        var title = document.getElementById('summary-val').innerText;
+        var sync_block = document.getElementById('syncpanelinfo-backbone');
+
+        var sync_items = sync_block.querySelectorAll('dl');
+        var sync_id = sync_items[0].querySelector('span.view-issue-field').innerText;
+        var url = location.origin + '/browse/';
+
+        var event = new CustomEvent("open_window", { detail: {
+            text: `${url}/${issue_id} (ВБИ ${sync_id}) - ${title}`,
+            win_name: Math.pow(0, 999).toString(),
+        } });
+        document.dispatchEvent(event);
+    }
+
+    function removeSuccessSubtask() {
+        document.getElementById("show-more-links-link").click()
+        let lists = document.querySelectorAll('dl.links-list');
+
+        for (let i in lists) {
+            let list = lists[i];
+            let title = list.querySelector('dt');
+            if (title.getAttribute('title') == 'Подзадачи') {
+                let tasks = list.querySelectorAll('dd');
+                for (let j in tasks) {
+                    let task = tasks[j];
+                    let statusElement = task.querySelector('li.status');
+                    let status = statusElement.querySelector('span.jira-issue-status-lozenge-done');
+                    if (status) {
+                        task.remove();
+                    }
+                }
+            }
+        }
+    }
+
 
     registerSite(/^https?:\/\/jira.*$/, [{
         action: "Open MR",
@@ -67,5 +98,11 @@
     },{
         action: "Copy for document",
         script: copyForComments
+    },{
+        action: "Copy for backlog",
+        script: copyForBacklog
+    },{
+        action: "Remove success subtask",
+        script: removeSuccessSubtask
     }]);
 })();

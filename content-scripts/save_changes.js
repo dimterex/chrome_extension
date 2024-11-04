@@ -1,3 +1,4 @@
+
 let save_changes_actions = {
       "save_changes": () => save_changes(),
 }
@@ -12,7 +13,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 function save_changes() {
-      const htmlContent = document.documentElement.outerHTML;
+      const htmlContent = "<!DOCTYPE html> \n" + document.documentElement.outerHTML;
       console.log(location.href);
       let filename = location.pathname.split('/').pop() || 'modified_page.html';
       filename = decodeURIComponent(filename);
