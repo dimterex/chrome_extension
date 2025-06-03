@@ -83,48 +83,75 @@ var registerSite;
     function injectEventListeners(tab) {
         chrome.scripting.executeScript({
             target: { tabId: tab.id },
-            func: (extension_id) => {
-                var extensionUrl = `chrome-extension://${extension_id}`;
-                document.addEventListener("open_window", function(event) {
-                    if (event.type) {
-                        switch (event.type) {
-                            case "open_window":
-                                const header = `<!DOCTYPE html> 
-                                <html lang="ru"> 
-                                    <head> 
-                                        <link rel="stylesheet" type="text/css" href="${extensionUrl}/css/main.css">
-                                        <meta charset="utf-8">
-                                    </head> 
-                                    <body>`;
-                                const footer = "</body> </html>";
-                                const e = event.detail;
-                        
-                                const winUrl = URL.createObjectURL(
-                                    new Blob([`${header} ${e.text} ${footer}`], { type: "text/html" })
-                                );
-                        
-                                window.open(
-                                    winUrl,
-                                    e.win_name,
-                                    `width=600,height=300,screenX=200,screenY=200`
-                                );
-                                return;
+            func: (extension_id) =>  {
 
-                            default:
-                                return;
-                        }
+                function show_notification(message) {
+                    var notification = document.createElement("div");
+                    notification.id = "notification";
+                    notification.style = "display: block; position: fixed; top: 20px; right: 20px; background-color: #333; color: white; padding: 10px 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); opacity: 1;";
+
+                    notification.textContent = message;
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 3000);
+                }
+
+                 var extensionUrl = `chrome-extension://${extension_id}`;
+                document.addEventListener("custom_event", function(event) {
+                    const details = event.detail;
+                    const event_type = details.event_type;
+                    console.log(details);
+                    switch (event_type) {
+                        case "open_window":
+                            
+                            const header = `<!DOCTYPE html>
+                                                           <html lang="ru">
+                                                               <head>
+                                                                   <link rel="stylesheet" type="text/css" href="${extensionUrl}/css/main.css">
+                                                                   <meta charset="utf-8">
+                                                               </head>
+                                                               <body>`;
+                                                           const footer = "</body> </html>";
+
+                            const winUrl = URL.createObjectURL(
+                                new Blob([`${header} ${details.content} ${footer}`], { type: "text/html" })
+                            );
+
+                            window.open(
+                                winUrl,
+                                details.win_name,
+                                `width=600,height=300,screenX=200,screenY=200`
+                            );
+
+                        
+                        case "copy":
+                            var copyFrom = document.createElement("textarea");
+                            copyFrom.textContent = details.content;
+                            document.body.appendChild(copyFrom);
+                            copyFrom.select();
+                            document.execCommand('copy');
+                            copyFrom.blur();
+                            document.body.removeChild(copyFrom);
+                            show_notification("Скопировано");
+                           
+                        case "notification":
+                            show_notification(details.content);
+                            return;
+                        
+                        default:
+                            return;
                     }
                 });
             },
-            args: [chrome.runtime.id],
+             args: [chrome.runtime.id],
             world: "MAIN"
           }); 
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         console.log(document);
-
-        
 
         ctrButtonsBlock = document.getElementById('buttons-block');
         ctrProgressBlock = document.getElementById('progress-block');
@@ -137,7 +164,7 @@ var registerSite;
                 if (__sites[i].site.test(activeTab.url)) {
                     let functions = __sites[i].functions;
                     for (let j = 0; j < functions.length; ++j) {
-                        registerFunction(activeTab, functions[j]);
+                        registerFunction(activeTab, functions[j], () =>  { window.close(); });
                     }
 
                     injectEventListeners(activeTab);

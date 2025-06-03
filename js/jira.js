@@ -35,19 +35,21 @@
         var liElements = olElement.querySelectorAll('li');
         var url = location.origin + '/browse/';
 
-        let content = [];
+        let contents = [];
         for (var i = 0; i < liElements.length; i++) {
             var liElement = liElements[i];
             var path = url + liElement.getAttribute('data-key');
             var name = liElement.getAttribute('title');
-            console.log(name)
             content.push(`<div>${path + ": " + name}</div>`);
         }
-
-        var event = new CustomEvent("open_window", { detail: {
-            text: content.join(""),
-            win_name: "comments",
-        } });
+        var event = new CustomEvent("custom_event", {
+            detail: {
+                event_type: "open_window",
+                content: contents.join(""),
+                win_name: "comments",
+            }
+        });
+     
         document.dispatchEvent(event);
     }
 
@@ -60,10 +62,12 @@
         var sync_id = sync_items[0].querySelector('span.view-issue-field').innerText;
         var url = location.origin + '/browse/';
 
-        var event = new CustomEvent("open_window", { detail: {
-            text: `${url}/${issue_id} (ВБИ ${sync_id}) - ${title}`,
-            win_name: Math.pow(0, 999).toString(),
-        } });
+        var event = new CustomEvent("custom_event", {
+            detail: {
+                event_type: "copy",
+                content: `${url}/${issue_id} (ВБИ ${sync_id}) - ${title}`
+            }
+        });
         document.dispatchEvent(event);
     }
 

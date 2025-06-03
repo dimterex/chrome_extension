@@ -49,5 +49,5 @@
         "run_at": "document_end",
         "css": ["css/main.css"]
     }],
-    "version": "0.0.8"
+    "version": "0.1.0"
 }
