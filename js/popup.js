@@ -16,6 +16,25 @@ var registerSite;
         });
     }
 
+    // Общие методы
+    const sharedMethods = {
+       
+        getExtensionId: () => {
+            return chrome.runtime.id;
+        },
+        sendMessageToContentScript: (tabId, message) => {
+            chrome.tabs.sendMessage(tabId, message);
+        }
+    };
+
+    // Экспорт методов через chrome.runtime.onMessage
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.action && sharedMethods[message.action]) {
+            const result = sharedMethods[message.action](...message.args);
+            sendResponse(result);
+        }
+    });
+
     function setMessage(message, append) {
         var height;
 
@@ -64,13 +83,19 @@ var registerSite;
     function injectEventListeners(tab) {
         chrome.scripting.executeScript({
             target: { tabId: tab.id },
-            func: () => {
+            func: (extension_id) => {
+                var extensionUrl = `chrome-extension://${extension_id}`;
                 document.addEventListener("open_window", function(event) {
-                    console.log(event);
                     if (event.type) {
                         switch (event.type) {
                             case "open_window":
-                                const header = `<!DOCTYPE html> <html lang="ru"> <head> <meta charset="utf-8"> </head> <body>`;
+                                const header = `<!DOCTYPE html> 
+                                <html lang="ru"> 
+                                    <head> 
+                                        <link rel="stylesheet" type="text/css" href="${extensionUrl}/css/main.css">
+                                        <meta charset="utf-8">
+                                    </head> 
+                                    <body>`;
                                 const footer = "</body> </html>";
                                 const e = event.detail;
                         
@@ -84,18 +109,22 @@ var registerSite;
                                     `width=600,height=300,screenX=200,screenY=200`
                                 );
                                 return;
+
                             default:
                                 return;
                         }
                     }
                 });
             },
+            args: [chrome.runtime.id],
             world: "MAIN"
           }); 
     }
 
     document.addEventListener('DOMContentLoaded', function() {
         console.log(document);
+
+        
 
         ctrButtonsBlock = document.getElementById('buttons-block');
         ctrProgressBlock = document.getElementById('progress-block');

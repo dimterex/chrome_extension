@@ -32,6 +32,12 @@
         "*://*/*",
         "<all_urls>"
     ],
+    "web_accessible_resources": [
+        {
+            "resources": ["css/main.css"],
+            "matches": ["<all_urls>"]
+        }
+    ],
     "content_scripts": [{
         "matches": ["<all_urls>"],
         "js": [
@@ -40,7 +46,8 @@
             "content-scripts/tables.js", 
             "content-scripts/save_changes.js"
         ],
-        "run_at": "document_end"
+        "run_at": "document_end",
+        "css": ["css/main.css"]
     }],
-    "version": "0.0.7"
+    "version": "0.0.8"
 }
