@@ -16,25 +16,6 @@ var registerSite;
         });
     }
 
-    // Общие методы
-    const sharedMethods = {
-       
-        getExtensionId: () => {
-            return chrome.runtime.id;
-        },
-        sendMessageToContentScript: (tabId, message) => {
-            chrome.tabs.sendMessage(tabId, message);
-        }
-    };
-
-    // Экспорт методов через chrome.runtime.onMessage
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.action && sharedMethods[message.action]) {
-            const result = sharedMethods[message.action](...message.args);
-            sendResponse(result);
-        }
-    });
-
     function setMessage(message, append) {
         var height;
 
@@ -53,7 +34,7 @@ var registerSite;
         document.querySelector('html').style.height = height;
     }
 
-    function registerFunction(activeTab, item) {
+    function registerFunction(activeTab, item, callback) {
         let div = document.createElement("div");
         let button = document.createElement("a");
         button.href = "#";
@@ -65,6 +46,7 @@ var registerSite;
         button.addEventListener('click', function(event) {
             event.preventDefault();
             injectScript(activeTab, item.script);
+            callback();
         });
 
         ctrButtonsBlock.appendChild(div);
@@ -98,7 +80,8 @@ var registerSite;
                     }, 3000);
                 }
 
-                 var extensionUrl = `chrome-extension://${extension_id}`;
+                var extensionUrl = `chrome-extension://${extension_id}`;
+                
                 document.addEventListener("custom_event", function(event) {
                     const details = event.detail;
                     const event_type = details.event_type;
@@ -107,13 +90,13 @@ var registerSite;
                         case "open_window":
                             
                             const header = `<!DOCTYPE html>
-                                                           <html lang="ru">
-                                                               <head>
-                                                                   <link rel="stylesheet" type="text/css" href="${extensionUrl}/css/main.css">
-                                                                   <meta charset="utf-8">
-                                                               </head>
-                                                               <body>`;
-                                                           const footer = "</body> </html>";
+                                <html lang="ru">
+                                    <head>
+                                        <link rel="stylesheet" type="text/css" href="${extensionUrl}/css/main.css">
+                                        <meta charset="utf-8">
+                                    </head>
+                                    <body>`;
+                            const footer = "</body> </html>";
 
                             const winUrl = URL.createObjectURL(
                                 new Blob([`${header} ${details.content} ${footer}`], { type: "text/html" })
@@ -124,7 +107,7 @@ var registerSite;
                                 details.win_name,
                                 `width=600,height=300,screenX=200,screenY=200`
                             );
-
+                            return;
                         
                         case "copy":
                             var copyFrom = document.createElement("textarea");
@@ -135,6 +118,7 @@ var registerSite;
                             copyFrom.blur();
                             document.body.removeChild(copyFrom);
                             show_notification("Скопировано");
+                            return;
                            
                         case "notification":
                             show_notification(details.content);
