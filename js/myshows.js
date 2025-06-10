@@ -2,7 +2,7 @@
     "use strict";
 
     function download_page() {
-        // ToDo: 
+        // ToDo:
         // 3. Подумать убрать статус "В процессе"
 
         function formatBytes(bytes, decimals = 2) {
@@ -124,11 +124,13 @@
         `;
         });
 
-       
-        var event = new CustomEvent("open_window", { detail: {
-            text: result_html,
-            win_name: "download_page",
-        } });
+         var event = new CustomEvent("custom_event", {
+                    detail: {
+                        event_type: "open_window",
+                        content: result_html,
+                        win_name: "download_page",
+                    }
+                });
         document.dispatchEvent(event);
     }
 
