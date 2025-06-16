@@ -1,4 +1,4 @@
-.btn {
+.custom-btn {
   font-family: Arial;
   font-size: 10pt;
   text-align: center;
@@ -11,7 +11,7 @@
   margin: 2px 2px;
 }
 
-.btn:hover {
+.custom-btn:hover {
   background: #3cb0fd;
 }
 
@@ -40,7 +40,7 @@
   width: 200px;
 }
 
-.popup .btn {
+.popup .custom-btn {
   width: auto;
   display: block;
 }
@@ -63,7 +63,7 @@ input[type='checkbox'] {
   margin: 1.2rem 0;
 }
 
-.lbl-toggle {
+.custom-collapsible-button {
   display: block;
   font-weight: bold;
   font-family: monospace;
@@ -77,11 +77,11 @@ input[type='checkbox'] {
   transition: all 0.25s ease-out;
 }
 
-.lbl-toggle:hover {
+.custom-collapsible-button:hover {
   color: #FFF;
 }
 
-.lbl-toggle::before {
+.custom-collapsible-button::before {
   content: ' ';
   display: inline-block;
   border-top: 5px solid transparent;
@@ -93,7 +93,7 @@ input[type='checkbox'] {
   transition: transform .2s ease-out;
 }
 
-.toggle:checked+.lbl-toggle::before {
+.toggle:checked+.custom-collapsible-button::before {
   transform: rotate(90deg) translateX(-3px);
 }
 
@@ -103,11 +103,11 @@ input[type='checkbox'] {
   transition: max-height .25s ease-in-out;
 }
 
-.toggle:checked+.lbl-toggle+.collapsible-content {
+.toggle:checked+.custom-collapsible-button+.collapsible-content {
   max-height: 100%;
 }
 
-.toggle:checked+.lbl-toggle {
+.toggle:checked+.custom-collapsible-button {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }

@@ -38,7 +38,7 @@ var registerSite;
         let div = document.createElement("div");
         let button = document.createElement("a");
         button.href = "#";
-        button.classList = ["btn"];
+        button.classList = ["custom-btn"];
         button.innerText = item.action;
 
         div.appendChild(button);

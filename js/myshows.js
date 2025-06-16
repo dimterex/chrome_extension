@@ -40,7 +40,7 @@
             result_html += `
                 <div class="wrap-collabsible"> 
                     <input id="collapsible${counter}" class="toggle" type="checkbox">
-                    <label for="collapsible${counter}" class="lbl-toggle">${title}</label>
+                    <label for="collapsible${counter}" class="custom-collapsible-button">${title}</label>
                     <div class="collapsible-content">
                         <div class="content-inner">
            
