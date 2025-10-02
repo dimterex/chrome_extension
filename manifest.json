@@ -26,7 +26,10 @@
         "nativeMessaging"
     ],
     "background": {
-        "service_worker": "content-scripts/context_menu.js"
+        "service_worker": "content-scripts/context_menu.js",
+        "scripts": [
+            "content-scripts/context_menu.js"
+        ]
     },
     "host_permissions": [
         "*://*/*",

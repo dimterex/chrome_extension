@@ -29,7 +29,7 @@ var registerSite;
             ctrProgressText.innerText = message;
         }
 
-        height = (message ? ctrProgressBlock : ctrButtonsBlock).clientHeight;
+        height = (message ? ctrProgressBlock : ctrButtonsBlock).height;
         document.body.style.height = height;
         document.querySelector('html').style.height = height;
     }
@@ -40,9 +40,10 @@ var registerSite;
         button.href = "#";
         button.classList = ["custom-btn"];
         button.innerText = item.action;
+        button.style
 
         div.appendChild(button);
-        
+
         button.addEventListener('click', function(event) {
             event.preventDefault();
             injectScript(activeTab, item.script);
@@ -50,10 +51,12 @@ var registerSite;
         });
 
         ctrButtonsBlock.appendChild(div);
+
+        setMessage();
     }
 
     function injectScript(tab, script) {
-        console.log(script);
+        console.log("injectScript");
 
         chrome.scripting.executeScript({
             target: { tabId: tab.id },
@@ -135,15 +138,13 @@ var registerSite;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        console.log(document);
-
         ctrButtonsBlock = document.getElementById('buttons-block');
         ctrProgressBlock = document.getElementById('progress-block');
         ctrProgressText = document.getElementById('progress-text');
-
-        setMessage();
-        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        
+         chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
             let activeTab = tabs[0];
+            console.log(activeTab);
             for (let i = 0; i < __sites.length; ++i) {
                 if (__sites[i].site.test(activeTab.url)) {
                     let functions = __sites[i].functions;
@@ -152,12 +153,13 @@ var registerSite;
                     }
 
                     injectEventListeners(activeTab);
-                   
+                
                     return;
                 }
             }
 
             setMessage("Can't find actions.");
         });
+
     });
 })();
